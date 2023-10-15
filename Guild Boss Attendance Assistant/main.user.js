@@ -7,8 +7,8 @@
 // @match        *lyrania.co.uk/game.php
 // @match        *dev.lyrania.co.uk/game.php
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=lyrania.co.uk
-// @updateUrl    https://raw.githubusercontent.com/KeskeDutchie/tampermonkey-scripts/main/Guild%20Boss%20Attendance%20Assistant/main.js
-// @downloadUrl  https://raw.githubusercontent.com/KeskeDutchie/tampermonkey-scripts/main/Guild%20Boss%20Attendance%20Assistant/main.js
+// @updateUrl    https://raw.githubusercontent.com/KeskeDutchie/tampermonkey-scripts/main/Guild%20Boss%20Attendance%20Assistant/main.user.js
+// @downloadUrl  https://raw.githubusercontent.com/KeskeDutchie/tampermonkey-scripts/main/Guild%20Boss%20Attendance%20Assistant/main.user.js
 // ==/UserScript==
 
 const chatwindow = document.getElementById("chatwindow");
