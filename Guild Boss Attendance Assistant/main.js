@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Guild Boss Attendance Assistant
 // @namespace    https://lyrania.co.uk
-// @version      0.1
+// @version      1.0
 // @description  try to take over the world!
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
