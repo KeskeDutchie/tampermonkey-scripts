@@ -31,7 +31,7 @@ var count = 0;
 			if (!mutation.addedNodes[0]) return;
 			const message = mutation.addedNodes[0].getElementsByClassName("guildchatcolor")[0];
 			if (message?.lastChild.lastChild.lastChild.textContent.includes("rolled")) {
-				addUser(message.lastChild.firstChild.firstChild.innerText);
+				addUser(message.lastChild.firstChild.firstChild.innerText.split(" ")[1]);
 			}
 		});
 	}).observe(chatwindow, {
