@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Guild Boss Attendance Assistant
 // @namespace    https://lyrania.co.uk
-// @version      1.1
+// @version      1.2
 // @description  try to take over the world!
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -31,7 +31,9 @@ var count = 0;
 			if (!mutation.addedNodes[0]) return;
 			const message = mutation.addedNodes[0].getElementsByClassName("guildchatcolor")[0];
 			if (message?.lastChild.lastChild.lastChild.textContent.includes("rolled")) {
-				addUser(message.lastChild.firstChild.firstChild.innerText.split(" ")[1]);
+				addUser(
+					message.lastChild.firstChild.firstChild.innerText.replace("Mod ", "").replace("Admin ", "").replace("Community ", "").replace("Owner ", "")
+				);
 			}
 		});
 	}).observe(chatwindow, {
