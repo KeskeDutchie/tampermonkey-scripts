@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Guild Boss Attendance Assistant
 // @namespace    https://lyrania.co.uk
-// @version      1.3
+// @version      1.4
 // @description  try to take over the world!
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -56,30 +56,24 @@ function initLog() {
 	tabButton.classList.add("nav-tab");
 	tabButton.innerText = "Attendance Log";
 
-	const copyButton = document.createElement("input");
-	copyButton.type = "button";
-	copyButton.id = "copybutton";
-	copyButton.value = "Copy Log";
-	copyButton.style.cssText = "float:right;margin-right:5px;";
-	copyButton.onclick = () => {
-		var usersString = "";
-		for (var i = 0; i < users.length; i++) usersString += users[i] + ",";
-		navigator.clipboard.writeText(usersString);
-	};
-
 	const resetButton = document.createElement("input");
 	resetButton.type = "button";
 	resetButton.id = "resetbutton";
-	resetButton.value = "Reset Log";
+	resetButton.value = "Copy and Reset Log";
 	resetButton.style.float = "right";
 	resetButton.onclick = () => {
-		if (!confirm("Reset Attendance Log?")) return;
-		users = [];
-		setCount(0);
-		while (attendanceLog.children.length > 0) {
-			attendanceLog.lastChild.remove();
-		}
-        localStorage.setItem("Attendance Log", JSON.stringify({ users: [] }));
+		var usersString = "";
+		for (var i = 0; i < users.length; i++) usersString += users[i] + ",";
+		navigator.clipboard.writeText(usersString);
+        setTimeout(() => {
+            if (!confirm("Reset Attendance Log?")) return;
+            users = [];
+            setCount(0);
+            while (attendanceLog.children.length > 0) {
+                attendanceLog.lastChild.remove();
+            }
+            localStorage.setItem("Attendance Log", JSON.stringify({ users: [] }));
+        }, 1);
 	};
 
 	countText = document.createElement("div");
@@ -89,12 +83,12 @@ function initLog() {
 	chattabs.insertBefore(attendanceLog, chattabs.children[2]);
 	chattabs.children[3].append(tabButton);
 	document.getElementById("chat").insertBefore(resetButton, chattabs);
-	document.getElementById("chat").insertBefore(copyButton, chattabs);
 	document.getElementById("chat").insertBefore(countText, chattabs);
 }
 
 function initUsers() {
     var rawLog = localStorage.getItem("Attendance Log");
+    console.log(rawLog);
     if (!rawLog) rawLog = JSON.stringify({ users: [] });
     var savedLog = JSON.parse(rawLog);
     for (var i = 0; i < savedLog.users.length; i++) {
