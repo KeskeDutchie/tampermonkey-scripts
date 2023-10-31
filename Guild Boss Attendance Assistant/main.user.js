@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Guild Boss Attendance Assistant
 // @namespace    https://lyrania.co.uk
-// @version      1.2.1
+// @version      1.3
 // @description  try to take over the world!
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -24,6 +24,7 @@ var count = 0;
 	"use strict";
 
 	initLog();
+    initUsers();
 
 	const chatObserver = new MutationObserver(mutations => {
 		if (mutations.length >= 10) return; // Either init or really fast spam, so we ignore
@@ -78,6 +79,7 @@ function initLog() {
 		while (attendanceLog.children.length > 0) {
 			attendanceLog.lastChild.remove();
 		}
+        localStorage.setItem("Attendance Log", JSON.stringify({ users: [] }));
 	};
 
 	countText = document.createElement("div");
@@ -91,6 +93,15 @@ function initLog() {
 	document.getElementById("chat").insertBefore(countText, chattabs);
 }
 
+function initUsers() {
+    var rawLog = localStorage.getItem("Attendance Log");
+    if (!rawLog) rawLog = JSON.stringify({ users: [] });
+    var savedLog = JSON.parse(rawLog);
+    for (var i = 0; i < savedLog.users.length; i++) {
+        addUser(savedLog.users[i]);
+    }
+}
+
 function addUser(user) {
 	if (users.includes(user)) return;
 
@@ -100,6 +111,7 @@ function addUser(user) {
 	chatObject.textContent = user;
 	attendanceLog.prepend(chatObject);
 	setCount(++count);
+    localStorage.setItem("Attendance Log", JSON.stringify({ users: users }));
 }
 
 function setCount(c) {
