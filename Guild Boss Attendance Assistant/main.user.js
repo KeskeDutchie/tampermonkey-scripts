@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Guild Boss Attendance Assistant
 // @namespace    https://lyrania.co.uk
-// @version      1.4
+// @version      1.4.1
 // @description  try to take over the world!
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -62,18 +62,18 @@ function initLog() {
 	resetButton.value = "Copy and Reset Log";
 	resetButton.style.float = "right";
 	resetButton.onclick = () => {
-		var usersString = "";
-		for (var i = 0; i < users.length; i++) usersString += users[i] + ",";
-		navigator.clipboard.writeText(usersString);
+        if (!confirm("Reset Attendance Log?")) return;
         setTimeout(() => {
-            if (!confirm("Reset Attendance Log?")) return;
+            var usersString = "";
+            for (var i = 0; i < users.length; i++) usersString += users[i] + ",";
+            navigator.clipboard.writeText(usersString);
             users = [];
             setCount(0);
             while (attendanceLog.children.length > 0) {
                 attendanceLog.lastChild.remove();
             }
             localStorage.setItem("Attendance Log", JSON.stringify({ users: [] }));
-        }, 1);
+        }, 250);
 	};
 
 	countText = document.createElement("div");
