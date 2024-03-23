@@ -1,12 +1,14 @@
 // ==UserScript==
 // @name         Lyr QoL
 // @namespace    https://lyrania.co.uk
-// @version      0.2
+// @version      0.2.1
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
 // @match        *dev.lyrania.co.uk/game.php
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=lyrania.co.uk
+// @downloadURL  https://github.com/KeskeDutchie/tampermonkey-scripts/raw/main/LyrQoL/main.user.js
+// @updateURL    https://github.com/KeskeDutchie/tampermonkey-scripts/raw/main/LyrQoL/main.user.js
 // ==/UserScript==
 
 const chatwindow = document.getElementById("chatwindow");
