@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lyr QoL
 // @namespace    https://lyrania.co.uk
-// @version      0.2.1
+// @version      0.2.2
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -49,6 +49,8 @@ var lossCount = 0;
 
 var bossDamageArray = [];
 
+var questOpened = false;
+
 const gems = ["Diamond", "Sapphire", "Ruby", "Emerald", "Opal", "Diamonds", "Sapphires", "Rubies", "Emeralds", "Opals"];
 
 const roomCompleted = "https://www.pacdv.com/sounds/interface_sound_effects/sound95.wav";
@@ -69,13 +71,13 @@ if (Notification.permission !== "denied") { Notification.requestPermission(); }
             const prev = document.createElement("input");
             prev.type = "button";
             prev.value = "Previous";
-            prev.setAttribute("onclick", "if ($(\"#travellist\")[0].value > 1) $(\"#travellist\")[0].value = parseInt($(\"#travellist\")[0].value) - 1");
+            prev.setAttribute("onclick", "if ($(\"#travellist\")[0].selectedIndex != 0) {$(\"#travellist\")[0].selectedIndex -= 1;}");
             $("#travellist")[0].parentNode.insertBefore(prev, $("#travellist")[0].parentNode.children[2]);
             prev.outerHTML += " ";
             const next = document.createElement("input");
             next.type = "button";
             next.value = "Next";
-            next.setAttribute("onclick", "if ($(\"#travellist\")[0].value < document.querySelectorAll('#travellist > option').length) $(\"#travellist\")[0].value = parseInt($(\"#travellist\")[0].value) + 1");
+            next.setAttribute("onclick", "if ($(\"#travellist\")[0].selectedIndex != $(\"#travellist\")[0].children.length - 1) {$(\"#travellist\")[0].selectedIndex += 1;}");
             $("#travellist")[0].parentNode.insertBefore(next, $("#travellist")[0].parentNode.children[4]);
             next.outerHTML = " " + next.outerHTML;
         }
@@ -236,9 +238,6 @@ if (Notification.permission !== "denied") { Notification.requestPermission(); }
         mutations.forEach(mutation => {
             if (!mutation.addedNodes[0]) return;
             const message = mutation.addedNodes[0].getElementsByClassName("guildchatcolor")[0]?.getElementsByTagName("span")[0]?.innerText;
-            if (message?.includes("trapped a boss")) {
-                mutation.addedNodes[0].getElementsByClassName("guildchatcolor")[0].getElementsByTagName("span")[0].innerHTML = message.replace("trapped a boss", "<a href='javascript:guildpage(11);'>trapped a boss</a>");
-            }
             if (message?.includes(username) && message.includes("plat ")) {
                 if (!eval("gmapDrops").Platinum) eval("gmapDrops").Platinum = 0;
 
@@ -262,6 +261,28 @@ if (Notification.permission !== "denied") { Notification.requestPermission(); }
 
     const popupObserver = new MutationObserver(function(mutations) {
         var target = mutations[0].target;
+        console.log(target);
+        var questMob = $("#quest_mob")[0];
+        if (questMob) {
+            questMob.style.marginBottom = 10;
+            if (!questOpened) {
+                questOpened = true;
+                questMob.parentNode.insertBefore(document.createElement("br"), questMob.parentNode.children[1]);
+                const prev = document.createElement("input");
+                prev.type = "button";
+                prev.value = "Previous";
+                prev.setAttribute("onclick", "if ($(\"#quest_mob\")[0].selectedIndex != 0) {$(\"#quest_mob\")[0].selectedIndex -= 1;}");
+                questMob.parentNode.insertBefore(prev, questMob.parentNode.children[2]);
+                prev.outerHTML += " ";
+                const next = document.createElement("input");
+                next.type = "button";
+                next.value = "Next";
+                next.setAttribute("onclick", "if ($(\"#quest_mob\")[0].selectedIndex != $(\"#quest_mob\")[0].children.length - 1) {$(\"#quest_mob\")[0].selectedIndex += 1;}");
+                questMob.parentNode.insertBefore(next, questMob.parentNode.children[4]);
+                next.outerHTML = " " + next.outerHTML;
+            }
+            return;
+        } else questOpened = false;
         if (target.tagName == "A")
         {
             var filterText = mutations[0].target.parentNode.textContent.split("  ");
