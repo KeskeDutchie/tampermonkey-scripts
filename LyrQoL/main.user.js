@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lyr QoL
 // @namespace    https://lyrania.co.uk
-// @version      0.2.2
+// @version      0.2.3
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -174,13 +174,13 @@ if (Notification.permission !== "denied") { Notification.requestPermission(); }
             if (bossDamageArray.length > 10) bossDamageArray.shift();
             const totalDamage = parseFor(bossSummary, "You have done").split("done ")[1].split(" damage")[0].replace(/,/g, "");
             const timeRemainingArray = parseFor(bossSummary, "minutes").split("another ")[1].split(" seconds")[0].split(" minutes and ");
-            const timeRemaining = parseInt(timeRemainingArray[0])+parseFloat(timeRemainingArray[1]/60);
+            const timeRemaining = parseInt(timeRemainingArray[0])*60+parseFloat(timeRemainingArray[1]);
             var averageDamage = bossDamageArray[0]
             for (var i = 1; i < bossDamageArray.length; i++) {
                 averageDamage += bossDamageArray[i];
             }
             averageDamage /= bossDamageArray.length;
-            const predictedDamage = parseInt(totalDamage) + timeRemaining * (12 + 2 / 3) * averageDamage;
+            const predictedDamage = parseInt(totalDamage) + Math.floor(timeRemaining / 4.7) * averageDamage;
 
             bossSummary.insertBefore(document.createTextNode("(You have done "+tickDamage.toLocaleString()+" damage to this boss this action)"), insertPosition(bossSummary, "SPAN"));
             bossSummary.insertBefore(document.createElement("br"), insertPosition(bossSummary, "SPAN"));
@@ -267,18 +267,18 @@ if (Notification.permission !== "denied") { Notification.requestPermission(); }
             questMob.style.marginBottom = 10;
             if (!questOpened) {
                 questOpened = true;
-                questMob.parentNode.insertBefore(document.createElement("br"), questMob.parentNode.children[1]);
+                questMob.parentNode.insertBefore(document.createElement("br"), questMob.parentNode.children[Array.prototype.indexOf.call(questMob.parent.children, questMob)+1]);
                 const prev = document.createElement("input");
                 prev.type = "button";
                 prev.value = "Previous";
                 prev.setAttribute("onclick", "if ($(\"#quest_mob\")[0].selectedIndex != 0) {$(\"#quest_mob\")[0].selectedIndex -= 1;}");
-                questMob.parentNode.insertBefore(prev, questMob.parentNode.children[2]);
+                questMob.parentNode.insertBefore(prev, questMob.parentNode.children[Array.prototype.indexOf.call(questMob.parent.children, questMob)-1]);
                 prev.outerHTML += " ";
                 const next = document.createElement("input");
                 next.type = "button";
                 next.value = "Next";
                 next.setAttribute("onclick", "if ($(\"#quest_mob\")[0].selectedIndex != $(\"#quest_mob\")[0].children.length - 1) {$(\"#quest_mob\")[0].selectedIndex += 1;}");
-                questMob.parentNode.insertBefore(next, questMob.parentNode.children[4]);
+                questMob.parentNode.insertBefore(next, questMob.parentNode.children[Array.prototype.indexOf.call(questMob.parent.children, questMob)+2]);
                 next.outerHTML = " " + next.outerHTML;
             }
             return;
