@@ -12,7 +12,7 @@
   - Guild Boss Damage Tracker formula isn't very accurate
   - Next and Previous buttons for Quest Mob don't render
 - Planned Features
-  - Ability to toggle any and all of the scripts' feature, in case one were to get annoyed with them
+  - Ability to toggle any and all of the script's features, in case one were to get annoyed with them
   - Add more things to Drop Tracker
   - Global Filter for specific Players and/or Guild
   - Next and Previous buttons for current mob
