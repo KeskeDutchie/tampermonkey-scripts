@@ -4,12 +4,15 @@
   - Notifications for Tradeskills
   - Drop Tracker
   - Uncapped Level % Display
+  - Next and Previous buttons for Quest Mob
 - Known Bugs
   - Guild Boss Damage Tracker tries to read Area Boss too
   - Guild Boss Damage Tracker no longer works after consuming a potion
   - Guild Boss Damage Tracker doesn't account for the fact that summarize boss screen exists
   - Guild Boss Damage Tracker formula isn't very accurate
+  - Next and Previous buttons for Quest Mob don't render
 - Planned Features
   - Ability to toggle any and all of the scripts' feature, in case one were to get annoyed with them
   - Add more things to Drop Tracker
   - Global Filter for specific Players and/or Guild
+  - Next and Previous buttons for current mob
