@@ -1,4 +1,5 @@
 - Current Features
+  - Adds Loot Log messages into Battle Summary
   - Guild Boss Damage Tracker
   - Next and Previous buttons for Area Travel
   - Notifications for Tradeskills
