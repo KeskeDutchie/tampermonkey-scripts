@@ -12,3 +12,4 @@
 - Planned Features
   - Ability to toggle any and all of the scripts' feature, in case one were to get annoyed with them
   - Add more things to Drop Tracker
+  - Global Filter for specific Players and/or Guild
