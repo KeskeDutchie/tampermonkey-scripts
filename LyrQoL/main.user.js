@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lyr QoL
 // @namespace    https://lyrania.co.uk
-// @version      0.2.3
+// @version      0.2.4
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -65,7 +65,7 @@ if (Notification.permission !== "denied") { Notification.requestPermission(); }
     updateTracker();
     interval();
 
-    const contentObserver = new MutationObserver(function(mutations) {
+    const contentObserver = new MutationObserver(mutations => {
         const travelList = $("#travellist")[0];
         if (travelList) {
             const prev = document.createElement("input");
@@ -126,6 +126,8 @@ if (Notification.permission !== "denied") { Notification.requestPermission(); }
                 if (!eval(dropObj).XP) eval(dropObj).XP = 0;
 
                 eval(dropObj).XP += eval(parseFor(battleSummary, "Exp").split("- ")[1].split("*")[0].replace(/,/g, ""));
+
+                document.getElementById("expli").firstChild.innerText = (Math.round(eval(document.getElementById("expli").firstChild.dataset.tippyContent.replace(/,/g, ""))*100)/100).toLocaleString() + "%";
             }
 
             if (parseFor(battleSummary, "Guild Statue Drops")) {
@@ -249,7 +251,7 @@ if (Notification.permission !== "denied") { Notification.requestPermission(); }
         childList: true
     });
 
-    const equipmentObserver = new MutationObserver(function(mutations) {
+    const equipmentObserver = new MutationObserver(mutations => {
         if (mutations[0].addedNodes.length == 0) {
             dropTracker.style.display = "block";
             return;
@@ -259,7 +261,7 @@ if (Notification.permission !== "denied") { Notification.requestPermission(); }
         childList: true
     });
 
-    const popupObserver = new MutationObserver(function(mutations) {
+    const popupObserver = new MutationObserver(mutations => {
         var target = mutations[0].target;
         console.log(target);
         var questMob = $("#quest_mob")[0];
