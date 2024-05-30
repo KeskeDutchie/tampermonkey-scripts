@@ -1,0 +1,14 @@
+- Current Features
+  - Guild Boss Damage Tracker
+  - Next and Previous buttons for Area Travel
+  - Notifications for Tradeskills
+  - Drop Tracker
+  - Uncapped Level % Display
+- Known Bugs
+  - Guild Boss Damage Tracker tries to read Area Boss too
+  - Guild Boss Damage Tracker no longer works after consuming a potion
+  - Guild Boss Damage Tracker doesn't account for the fact that summarize boss screen exists
+  - Guild Boss Damage Tracker formula isn't very accurate
+- Planned Features
+  - Ability to toggle any and all of the scripts' feature, in case one were to get annoyed with them
+  - Add more things to Drop Tracker
