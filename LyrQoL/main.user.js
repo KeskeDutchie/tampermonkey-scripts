@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lyr QoL
 // @namespace    https://lyrania.co.uk
-// @version      0.2.4
+// @version      0.2.4.1
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -127,7 +127,7 @@ if (Notification.permission !== "denied") { Notification.requestPermission(); }
 
                 eval(dropObj).XP += eval(parseFor(battleSummary, "Exp").split("- ")[1].split("*")[0].replace(/,/g, ""));
 
-                document.getElementById("expli").firstChild.innerText = (Math.round(eval(document.getElementById("expli").firstChild.dataset.tippyContent.replace(/,/g, ""))*100)/100).toLocaleString() + "%";
+                document.getElementById("expli").firstChild.innerText = (Math.round(eval(document.getElementById("expli").firstChild.dataset.tippyContent.replace(/,/g, ""))*10000)/100).toLocaleString() + "%";
             }
 
             if (parseFor(battleSummary, "Guild Statue Drops")) {
