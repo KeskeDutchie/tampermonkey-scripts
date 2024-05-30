@@ -16,3 +16,4 @@
   - Add more things to Drop Tracker
   - Global Filter for specific Players and/or Guild
   - Next and Previous buttons for current mob
+  - Swap Filter Values from true -> false and vice-versa, for easier understanding
