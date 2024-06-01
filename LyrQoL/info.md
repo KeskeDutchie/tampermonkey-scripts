@@ -6,6 +6,7 @@
   - Drop Tracker
   - Uncapped Level % Display
   - Next and Previous buttons for Quest Mob
+  - Added Sound for Guild Dungeon Room Completion
 - Known Bugs
   - Guild Boss Damage Tracker tries to read Area Boss too
   - Guild Boss Damage Tracker no longer works after consuming a potion
