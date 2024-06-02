@@ -134,7 +134,7 @@ if (Notification.permission !== "denied") {
 				eval(dropObj).XP += eval(parseFor(battleSummary, "Exp").split("- ")[1].split("*")[0].replace(/,/g, ""));
 
 				let expPerAction = valuePerHour(eval(dropObj).XP) / 600;
-				let currentLevel = eval(document.getElementById("lvlli").innerText);
+				let currentLevel = eval(document.getElementById("lvlli").innerText.replace(/,/g, ""));
 				let [bankedExperience, neededExperience] = document
 					.getElementById("expli")
 					.firstChild.dataset.tippyContent.replace(/,/g, "")

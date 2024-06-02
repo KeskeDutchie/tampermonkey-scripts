@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lyr QoL
 // @namespace    https://lyrania.co.uk
-// @version      0.2.4.2
+// @version      0.2.5
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -133,8 +133,26 @@ if (Notification.permission !== "denied") {
 
 				eval(dropObj).XP += eval(parseFor(battleSummary, "Exp").split("- ")[1].split("*")[0].replace(/,/g, ""));
 
+				let expPerAction = valuePerHour(eval(dropObj).XP) / 600;
+				let currentLevel = eval(document.getElementById("lvlli").innerText.replace(/,/g, ""));
+				let [bankedExperience, neededExperience] = document
+					.getElementById("expli")
+					.firstChild.dataset.tippyContent.replace(/,/g, "")
+					.split("/")
+					.map(Number);
+				let finalLevel =
+					(1 / 50) *
+					(Math.sqrt(
+						4 * Math.pow(expPerAction, 2) -
+							100 * expPerAction * (2 * currentLevel + 1) +
+							25 * (8 * bankedExperience + 25 * Math.pow(2 * currentLevel + 1, 2))
+					) +
+						2 * expPerAction -
+						25);
+
 				document.getElementById("expli").firstChild.innerText =
-					(Math.round(eval(document.getElementById("expli").firstChild.dataset.tippyContent.replace(/,/g, "")) * 10000) / 100).toLocaleString() + "%";
+					(Math.round((bankedExperience / neededExperience) * 10000) / 100).toLocaleString() + "%";
+				document.getElementById("lvlli").innerText += " (" + Math.floor(finalLevel).toLocaleString() + ")";
 			}
 
 			if (parseFor(battleSummary, "Guild Statue Drops")) {
@@ -317,7 +335,9 @@ if (Notification.permission !== "denied") {
 })();
 
 function interval() {
-	checkTS();
+	try {
+		checkTS();
+	} catch (e) {} // Wrapping this in a try catch just so that it doesn't prevent the script from running if you refresh whilst TS are not running
 	setTimeout(interval, 6e4);
 }
 
