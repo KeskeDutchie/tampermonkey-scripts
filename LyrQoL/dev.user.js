@@ -26,21 +26,21 @@ var gmapDrops = {};
 var actionCount = 0;
 var guildActionCount = 0;
 var defaultDropFilters = {
-    Platinum: false,
-    XP: false,
-    Health: false,
-    Attack: false,
-    Defence: false,
-    Accuracy: false,
-    Evasion: false,
-    Diamonds: false,
-    Sapphires: false,
-    Rubies: false,
-    Emeralds: false,
-    Opals: false,
-    Jade: false,
-    "Jewel Fragments": false,
-    Tokens: false
+    Platinum: true,
+    XP: true,
+    Health: true,
+    Attack: true,
+    Defence: true,
+    Accuracy: true,
+    Evasion: true,
+    Diamonds: true,
+    Sapphires: true,
+    Rubies: true,
+    Emeralds: true,
+    Opals: true,
+    Jade: true,
+    "Jewel Fragments": true,
+    Tokens: true
 };
 var dropFilters = defaultDropFilters;
 var winCount = 0;
@@ -304,7 +304,7 @@ if (Notification.permission !== "denied") { Notification.requestPermission(); }
 })();
 
 function interval() {
-    checkTS();
+    try { checkTS(); } catch (e) {} // Wrapping this in a try catch just so that it doesn't prevent the script from running if you refresh whilst TS are not running
     setTimeout(interval, 6e4);
 }
 
@@ -476,7 +476,7 @@ function updateTracker() {
     var indent = false;
     dropsContainer.textContent = "";
     for (const [key, value] of Object.entries(eval(dropObj))) {
-        if (!dropFilters[key]) {
+        if (dropFilters[key]) {
             indent = true;
             dropsContainer.textContent += `${key}: ${value.toLocaleString()} (${valuePerHour(value).toLocaleString()}/hour)\r\n`;
         }
