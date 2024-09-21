@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dev Lyr QoL
 // @namespace    https://dev.lyrania.co.uk
-// @version      0.2.6
+// @version      0.2.7
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *dev.lyrania.co.uk/game.php
@@ -291,22 +291,21 @@ if (Notification.permission !== "denied") {
 
 	const popupObserver = new MutationObserver(mutations => {
 		let target = mutations[0].target;
-		console.log(target);
 		let questMob = $("#quest_mob")[0];
 		if (questMob) {
 			questMob.style.marginBottom = 10;
 			if (!questOpened) {
 				questOpened = true;
+				console.log(questMob.parentNode.children.length);
+				console.log(questMob.parentNode.children);
 				questMob.parentNode.insertBefore(
 					document.createElement("br"),
-					questMob.parentNode.children[Array.prototype.indexOf.call(questMob.parent.children, questMob) + 1]
+					questMob.parentNode.children[Array.prototype.indexOf.call(questMob.parentNode.children, questMob) + 1]
 				);
 				const prev = document.createElement("input");
 				prev.type = "button";
 				prev.value = "Previous";
 				prev.setAttribute("onclick", 'if ($("#quest_mob")[0].selectedIndex != 0) {$("#quest_mob")[0].selectedIndex -= 1;}');
-				questMob.parentNode.insertBefore(prev, questMob.parentNode.children[Array.prototype.indexOf.call(questMob.parent.children, questMob) - 1]);
-				prev.outerHTML += " ";
 				const next = document.createElement("input");
 				next.type = "button";
 				next.value = "Next";
@@ -314,7 +313,9 @@ if (Notification.permission !== "denied") {
 					"onclick",
 					'if ($("#quest_mob")[0].selectedIndex != $("#quest_mob")[0].children.length - 1) {$("#quest_mob")[0].selectedIndex += 1;}'
 				);
-				questMob.parentNode.insertBefore(next, questMob.parentNode.children[Array.prototype.indexOf.call(questMob.parent.children, questMob) + 2]);
+				questMob.parentNode.insertBefore(prev, questMob.parentNode.children[Array.prototype.indexOf.call(questMob.parentNode.children, questMob) + 2]);
+				prev.outerHTML += " ";
+				questMob.parentNode.insertBefore(next, questMob.parentNode.children[Array.prototype.indexOf.call(questMob.parentNode.children, questMob) + 4]);
 				next.outerHTML = " " + next.outerHTML;
 			}
 			return;
