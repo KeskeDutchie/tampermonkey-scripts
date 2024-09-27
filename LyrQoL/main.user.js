@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lyr QoL
 // @namespace    https://lyrania.co.uk
-// @version      0.2.7
+// @version      0.2.8
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -52,7 +52,7 @@ let questOpened = false;
 
 const gems = ["Diamond", "Sapphire", "Ruby", "Emerald", "Opal", "Diamonds", "Sapphires", "Rubies", "Emeralds", "Opals"];
 
-const roomCompleted = "https://www.pacdv.com/sounds/interface_sound_effects/sound95.wav";
+const dungeonRoomCompleted = "https://www.pacdv.com/sounds/interface_sound_effects/sound95.wav";
 const tsCompleted = "https://www.pacdv.com/sounds/interface_sound_effects/sound92.wav";
 
 if (Notification.permission !== "denied") {
@@ -88,6 +88,11 @@ if (Notification.permission !== "denied") {
 		const battleSummary = content.querySelectorAll("div.lrow")[1]?.children[1];
 		if (battleSummary) {
 			let dropObj = "drops";
+			if ($("#bb")[0] && document.querySelector("#timer").innerText.slice(-1) == "6") {
+				setTimeout(() => {
+					playAudio(dungeonRoomCompleted);
+				}, 6e3);
+			}
 			if ($(".battleContainer")[0].children[1].innerText.includes("Shadow of ")) {
 				dropObj = "gmapDrops";
 				guildActionCount++;
@@ -97,7 +102,7 @@ if (Notification.permission !== "denied") {
 					document.querySelector("#timer").innerText.slice(-1) == "6"
 				) {
 					setTimeout(() => {
-						playAudio(roomCompleted);
+						playAudio(dungeonRoomCompleted);
 					}, 6e3);
 				}
 			} else {
@@ -228,13 +233,11 @@ if (Notification.permission !== "denied") {
 
 		if (!mutations.length > 0) return;
 
-		let obj;
+		let obj = content.querySelectorAll("div.lrow")[2]; // Battle Screen
 
-		obj = content.querySelectorAll("div.lrow")[2]; // Battle Screen
+		let valueChanged = false;
 
 		if ($(".battleContainer")[0]?.children[1].innerText.includes("Shadow of ")) {
-			let valueChanged = false;
-
 			if (!obj) {
 				obj = content.querySelectorAll("div.strong.text-center")[0]; // Map Auto
 				valueChanged = true;
@@ -244,6 +247,15 @@ if (Notification.permission !== "denied") {
 				valueChanged = true;
 			}
 			if (valueChanged) obj.previousSibling.remove();
+		} else if ($("#mobsLeft")[0] || $("#bb")[0]) {
+			if (!obj) {
+				obj = document.querySelector("div > div.flex-content > div.strong.text-center"); // Pmap auto
+				valueChanged = true;
+			}
+			if (!obj) {
+				obj = document.querySelector("#content > div:nth-child(2) > div.flex-content > span:nth-child(14)"); // PMap Room Finished or Single PMap Battle
+				valueChanged = true;
+			}
 		}
 
 		mutations.forEach(mutation => {
