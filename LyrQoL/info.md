@@ -1,11 +1,11 @@
 -   Current Features
     -   Adds Loot Log messages into Battle Summary
     -   Guild Boss Damage Tracker
-    -   Next and Previous buttons for Area Travel
+    -   Next and Previous buttons for Area Travel, Quest Mob, and Selected Mob
+    -   Seek Quest Mob button for Selected Mob
     -   Notifications for Tradeskills
     -   Drop Tracker
     -   Uncapped Level % Display
-    -   Next and Previous buttons for Quest Mob
     -   Added Sound for Guild and Personal Dungeon Room Completion
 -   Known Bugs
     -   Guild Boss Damage Tracker tries to read Area Boss too
@@ -16,4 +16,3 @@
     -   Ability to toggle any and all of the script's features, in case one were to get annoyed with them
     -   Add more things to Drop Tracker
     -   Global Filter for specific Players and/or Guild
-    -   Next and Previous buttons for current mob

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dev Lyr QoL
 // @namespace    https://dev.lyrania.co.uk
-// @version      0.2.8
+// @version      0.3
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *dev.lyrania.co.uk/game.php
@@ -73,8 +73,7 @@ if (Notification.permission !== "denied") {
 			prev.type = "button";
 			prev.value = "Previous";
 			prev.setAttribute("onclick", 'if ($("#travellist")[0].selectedIndex != 0) {$("#travellist")[0].selectedIndex -= 1;}');
-			$("#travellist")[0].parentNode.insertBefore(prev, $("#travellist")[0].parentNode.children[2]);
-			prev.outerHTML += " ";
+			prev.style.marginRight = "4px";
 			const next = document.createElement("input");
 			next.type = "button";
 			next.value = "Next";
@@ -82,8 +81,48 @@ if (Notification.permission !== "denied") {
 				"onclick",
 				'if ($("#travellist")[0].selectedIndex != $("#travellist")[0].children.length - 1) {$("#travellist")[0].selectedIndex += 1;}'
 			);
-			$("#travellist")[0].parentNode.insertBefore(next, $("#travellist")[0].parentNode.children[4]);
-			next.outerHTML = " " + next.outerHTML;
+			next.style.marginLeft = "4px";
+
+			travelList.parentNode.insertBefore(prev, travelList.parentNode.children[2]);
+			travelList.parentNode.insertBefore(next, travelList.parentNode.children[4]);
+			return;
+		}
+		const mobList = $("#mob")[0];
+		if (mobList) {
+			const prev = document.createElement("input");
+			prev.type = "button";
+			prev.value = "Previous";
+			prev.setAttribute("onclick", 'if ($("#mob")[0].selectedIndex != 0) {$("#mob")[0].selectedIndex -= 1;}');
+			prev.style.marginTop = "4px";
+			prev.style.marginRight = "4px";
+			const seek = document.createElement("input");
+			seek.type = "button";
+			seek.value = "Seek Quest Mob";
+			seek.setAttribute(
+				"onclick",
+				'var searchTerm = ""; ' +
+					'if ($("#questtracker")[0].children[0].innerText.includes("Collect")) ' +
+					'searchTerm = $("#questtracker")[0].children[0].innerText.split("from ")[1].split("s\\n")[0];' +
+					'if ($("#questtracker")[0].children[0].innerText.includes("Kill")) {' +
+					'searchTerm = $("#questtracker")[0].children[0].innerText.split("Kill ")[1];' +
+					'searchTerm = searchTerm.substring(searchTerm.indexOf(" ") + 1).split("s\\n")[0];}' +
+					'for (var i = 0; i < $("#mob")[0].options.length; i++) {' +
+					'	if ($("#mob")[0].options[i].text == searchTerm) {' +
+					'		$("#mob")[0].options[i].selected = true; return;}}'
+			);
+			seek.style.marginTop = "4px";
+			seek.style.marginRight = "4px";
+			const next = document.createElement("input");
+			next.type = "button";
+			next.value = "Next";
+			next.setAttribute("onclick", 'if ($("#mob")[0].selectedIndex != $("#mob")[0].children.length - 1) {$("#mob")[0].selectedIndex += 1;}');
+			next.style.marginTop = "4px";
+
+			mobList.parentNode.appendChild(document.createElement("br"));
+			mobList.parentNode.appendChild(prev);
+			mobList.parentNode.appendChild(seek);
+			mobList.parentNode.appendChild(next);
+			return;
 		}
 		const battleSummary = content.querySelectorAll("div.lrow")[1]?.children[1];
 		if (battleSummary) {
@@ -221,6 +260,7 @@ if (Notification.permission !== "denied") {
 				insertPosition(bossSummary, "SPAN")
 			);
 			bossSummary.insertBefore(document.createElement("br"), insertPosition(bossSummary, "SPAN"));
+			return;
 		}
 	}).observe(content, {
 		childList: true,
@@ -308,8 +348,6 @@ if (Notification.permission !== "denied") {
 			questMob.style.marginBottom = 10;
 			if (!questOpened) {
 				questOpened = true;
-				console.log(questMob.parentNode.children.length);
-				console.log(questMob.parentNode.children);
 				questMob.parentNode.insertBefore(
 					document.createElement("br"),
 					questMob.parentNode.children[Array.prototype.indexOf.call(questMob.parentNode.children, questMob) + 1]
@@ -356,19 +394,12 @@ function checkTS() {
 		playAudio(tsCompleted);
 		return notification("No Tradeskill Running.", "You do not currently have any tradeskills running.");
 	}
-	if ($("#ts1")[0]?.innerText === "00:00") {
-		playAudio(tsCompleted);
-		return notification("Tradeskill Completed.", "You have one or more tradeskills that have been completed.");
-	}
-	if ($("#ts2")[0]?.innerText === "00:00") {
-		playAudio(tsCompleted);
-		return notification("Tradeskill Completed.", "You have one or more tradeskills that have been completed.");
-	}
-	if ($("#ts3")[0]?.innerText === "00:00") {
-		playAudio(tsCompleted);
-		return notification("Tradeskill Completed.", "You have one or more tradeskills that have been completed.");
-	}
-	if ($("#ts4")[0]?.innerText === "00:00") {
+	if (
+		$("#ts1")[0]?.innerText === "00:00" ||
+		$("#ts2")[0]?.innerText === "00:00" ||
+		$("#ts3")[0]?.innerText === "00:00" ||
+		$("#ts4")[0]?.innerText === "00:00"
+	) {
 		playAudio(tsCompleted);
 		return notification("Tradeskill Completed.", "You have one or more tradeskills that have been completed.");
 	}
