@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lyr QoL
 // @namespace    https://lyrania.co.uk
-// @version      0.2.8
+// @version      0.3
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -19,6 +19,7 @@ const weaponupgrade = document.getElementById("equipstuff");
 const tstimer = document.getElementById("tstimer");
 const popup = document.getElementById("popup");
 const username = document.getElementById("usernameli").firstChild.innerText;
+const level = document.getElementById("lvlli");
 let dropTracker;
 let dropsContainer;
 let drops = {};
@@ -43,23 +44,41 @@ let defaultDropFilters = {
 	"Tokens": true,
 };
 let dropFilters = defaultDropFilters;
+let defaultScriptSettings = {
+	displayLoot: 1,
+	nextPrevArea: 1,
+	nextPrevQuest: 1,
+	nextPrevMob: 1,
+	seekQuestMob: 1,
+	TSNoti: 1,
+	dropTracker: 1,
+	uncapXP: 1,
+	pmapNoti: 1,
+	gmapNoti: 1,
+};
+let scriptSettings = defaultScriptSettings;
 let winCount = 0;
 let lossCount = 0;
 
 let bossDamageArray = [];
 
 let questOpened = false;
+let settingsOpened = false;
+
+let dropObj = "drops";
 
 const gems = ["Diamond", "Sapphire", "Ruby", "Emerald", "Opal", "Diamonds", "Sapphires", "Rubies", "Emeralds", "Opals"];
 
 const dungeonRoomCompleted = "https://www.pacdv.com/sounds/interface_sound_effects/sound95.wav";
 const tsCompleted = "https://www.pacdv.com/sounds/interface_sound_effects/sound92.wav";
+const constructionCompleted = "https://www.pacdv.com/sounds/mechanical_sound_effects/tape-measure-1.wav";
 
 if (Notification.permission !== "denied") {
 	Notification.requestPermission();
 }
 
 (async function () {
+	loadSettings();
 	initTracker();
 	loadFilters();
 	loadDrops();
@@ -68,13 +87,12 @@ if (Notification.permission !== "denied") {
 
 	const contentObserver = new MutationObserver(mutations => {
 		const travelList = $("#travellist")[0];
-		if (travelList) {
+		if (travelList && scriptSettings.nextPrevArea == 1) {
 			const prev = document.createElement("input");
 			prev.type = "button";
 			prev.value = "Previous";
 			prev.setAttribute("onclick", 'if ($("#travellist")[0].selectedIndex != 0) {$("#travellist")[0].selectedIndex -= 1;}');
-			$("#travellist")[0].parentNode.insertBefore(prev, $("#travellist")[0].parentNode.children[2]);
-			prev.outerHTML += " ";
+			prev.style.marginRight = "4px";
 			const next = document.createElement("input");
 			next.type = "button";
 			next.value = "Next";
@@ -82,13 +100,53 @@ if (Notification.permission !== "denied") {
 				"onclick",
 				'if ($("#travellist")[0].selectedIndex != $("#travellist")[0].children.length - 1) {$("#travellist")[0].selectedIndex += 1;}'
 			);
-			$("#travellist")[0].parentNode.insertBefore(next, $("#travellist")[0].parentNode.children[4]);
-			next.outerHTML = " " + next.outerHTML;
+			next.style.marginLeft = "4px";
+
+			travelList.parentNode.insertBefore(prev, travelList.parentNode.children[2]);
+			travelList.parentNode.insertBefore(next, travelList.parentNode.children[4]);
+			return;
+		}
+		const mobList = $("#mob")[0];
+		if (mobList && (scriptSettings.nextPrevMob == 1 || scriptSettings.seekQuestMob == 1)) {
+			const prev = document.createElement("input");
+			prev.type = "button";
+			prev.value = "Previous";
+			prev.setAttribute("onclick", 'if ($("#mob")[0].selectedIndex != 0) {$("#mob")[0].selectedIndex -= 1;}');
+			prev.style.marginTop = "4px";
+			prev.style.marginRight = "4px";
+			const seek = document.createElement("input");
+			seek.type = "button";
+			seek.value = "Seek Quest Mob";
+			seek.setAttribute(
+				"onclick",
+				'let searchTerm = ""; ' +
+					'if ($("#questtracker")[0].children[0].innerText.includes("Collect")) ' +
+					'searchTerm = $("#questtracker")[0].children[0].innerText.split("from ")[1].split("s\\n")[0];' +
+					'if ($("#questtracker")[0].children[0].innerText.includes("Kill")) {' +
+					'searchTerm = $("#questtracker")[0].children[0].innerText.split("Kill ")[1];' +
+					'searchTerm = searchTerm.substring(searchTerm.indexOf(" ") + 1).split("s\\n")[0];}' +
+					'for (let i = 0; i < $("#mob")[0].options.length; i++) {' +
+					'if ($("#mob")[0].options[i].text == searchTerm) {' +
+					'$("#mob")[0].options[i].selected = true; return;}}'
+			);
+			seek.style.marginTop = "4px";
+			seek.style.marginRight = "4px";
+			const next = document.createElement("input");
+			next.type = "button";
+			next.value = "Next";
+			next.setAttribute("onclick", 'if ($("#mob")[0].selectedIndex != $("#mob")[0].children.length - 1) {$("#mob")[0].selectedIndex += 1;}');
+			next.style.marginTop = "4px";
+
+			mobList.parentNode.appendChild(document.createElement("br"));
+			if (scriptSettings.nextPrevMob == 1) mobList.parentNode.appendChild(prev);
+			if (scriptSettings.seekQuestMob == 1) mobList.parentNode.appendChild(seek);
+			if (scriptSettings.nextPrevMob == 1) mobList.parentNode.appendChild(next);
+			return;
 		}
 		const battleSummary = content.querySelectorAll("div.lrow")[1]?.children[1];
 		if (battleSummary) {
-			let dropObj = "drops";
-			if ($("#bb")[0] && document.querySelector("#timer").innerText.slice(-1) == "6") {
+			dropObj = "drops";
+			if ($("#bb")[0] && document.querySelector("#timer").innerText.slice(-1) == "6" && scriptSettings.pmapNoti == 1) {
 				setTimeout(() => {
 					playAudio(dungeonRoomCompleted);
 				}, 6e3);
@@ -99,7 +157,8 @@ if (Notification.permission !== "denied") {
 				if (
 					!content.querySelectorAll("div.strong.text-center")[0] &&
 					content.querySelector("#content > div:nth-child(2) > div.flex-content").lastChild &&
-					document.querySelector("#timer").innerText.slice(-1) == "6"
+					document.querySelector("#timer").innerText.slice(-1) == "6" &&
+					scriptSettings.gmapNoti == 1
 				) {
 					setTimeout(() => {
 						playAudio(dungeonRoomCompleted);
@@ -134,27 +193,6 @@ if (Notification.permission !== "denied") {
 				if (!eval(dropObj).XP) eval(dropObj).XP = 0;
 
 				eval(dropObj).XP += eval(parseFor(battleSummary, "Exp").split("- ")[1].split("*")[0].replace(/,/g, ""));
-
-				let expPerAction = valuePerHour(eval(dropObj).XP) / 600;
-				let currentLevel = eval(document.getElementById("lvlli").innerText.replace(/,/g, ""));
-				let [bankedExperience, neededExperience] = document
-					.getElementById("expli")
-					.firstChild.dataset.tippyContent.replace(/,/g, "")
-					.split("/")
-					.map(Number);
-				let finalLevel =
-					(1 / 50) *
-					(Math.sqrt(
-						4 * Math.pow(expPerAction, 2) -
-							100 * expPerAction * (2 * currentLevel + 1) +
-							25 * (8 * bankedExperience + 25 * Math.pow(2 * currentLevel + 1, 2))
-					) +
-						2 * expPerAction -
-						25);
-
-				document.getElementById("expli").firstChild.innerText =
-					(Math.round((bankedExperience / neededExperience) * 10000) / 100).toLocaleString() + "%";
-				document.getElementById("lvlli").innerText += " (" + Math.floor(finalLevel).toLocaleString() + ")";
 			}
 
 			if (parseFor(battleSummary, "Guild Statue Drops")) {
@@ -221,21 +259,27 @@ if (Notification.permission !== "denied") {
 				insertPosition(bossSummary, "SPAN")
 			);
 			bossSummary.insertBefore(document.createElement("br"), insertPosition(bossSummary, "SPAN"));
+			return;
 		}
 	}).observe(content, {
 		childList: true,
 	});
 
 	const lootObserver = new MutationObserver(mutations => {
+		if (!mutations.length > 0) return;
+
 		const battleSummary = content.querySelectorAll("div.lrow")[1]?.children[1];
 
 		if (!battleSummary) return;
 
-		if (!mutations.length > 0) return;
-
-		let obj = content.querySelectorAll("div.lrow")[2]; // Battle Screen
+		let obj = content.querySelectorAll("div.lrow")[2]; // Auto Battle
 
 		let valueChanged = false;
+
+		if (!obj) {
+			obj = document.querySelector("#content > div:nth-child(2) > div.flex-content > div"); // Single Battle
+			valueChanged = true;
+		}
 
 		if ($(".battleContainer")[0]?.children[1].innerText.includes("Shadow of ")) {
 			if (!obj) {
@@ -266,11 +310,13 @@ if (Notification.permission !== "denied") {
 
 			if (!dropTracked) console.log(dropText);
 
-			obj.before(document.createTextNode(dropText));
-			obj.before(document.createElement("br"));
+			if (scriptSettings.displayLoot == 1) {
+				obj.before(document.createTextNode(dropText));
+				obj.before(document.createElement("br"));
+			}
 		});
 
-		if (valueChanged) obj.before(document.createElement("br"));
+		if (valueChanged && scriptSettings.displayLoot == 1) obj.before(document.createElement("br"));
 	}).observe(lootlog, {
 		childList: true,
 	});
@@ -292,7 +338,7 @@ if (Notification.permission !== "denied") {
 	});
 
 	const equipmentObserver = new MutationObserver(mutations => {
-		if (mutations[0].addedNodes.length == 0) {
+		if (mutations[0].addedNodes.length == 0 && scriptSettings.dropTracker == 1) {
 			dropTracker.style.display = "block";
 			return;
 		}
@@ -303,13 +349,11 @@ if (Notification.permission !== "denied") {
 
 	const popupObserver = new MutationObserver(mutations => {
 		let target = mutations[0].target;
-		let questMob = $("#quest_mob")[0];
-		if (questMob) {
+		const questMob = $("#quest_mob")[0];
+		if (questMob && scriptSettings.nextPrevQuest == 1) {
 			questMob.style.marginBottom = 10;
 			if (!questOpened) {
 				questOpened = true;
-				console.log(questMob.parentNode.children.length);
-				console.log(questMob.parentNode.children);
 				questMob.parentNode.insertBefore(
 					document.createElement("br"),
 					questMob.parentNode.children[Array.prototype.indexOf.call(questMob.parentNode.children, questMob) + 1]
@@ -338,15 +382,205 @@ if (Notification.permission !== "denied") {
 			saveFilters();
 			updateTracker();
 		}
+		const settings = $("#response")[0];
+		if (settings?.tagName == "DIV") {
+			if (!settingsOpened) {
+				settingsOpened = true;
+				loadSettings();
+				const settingsList = settings.children[0].children[0];
+				const inventdiv = $("#inventdiv2")[0].cloneNode();
+				inventdiv.id = "inventdiv11";
+				inventdiv.appendChild($("#inventdiv2")[0].children[0].cloneNode());
+				inventdiv.children[0].appendChild($("#inventdiv2")[0].children[0].children[0].cloneNode());
+				inventdiv.children[0].children[0].appendChild($("#inventdiv2")[0].children[0].children[0].children[0].cloneNode());
+				const settingsform = inventdiv.children[0].children[0].children[0];
+
+				const header = settingsList.children[0].cloneNode();
+				header.innerText = "Lyr QoL";
+				const options = settingsList.children[1].cloneNode();
+				const inventli = $("#inventli2")[0].cloneNode(true);
+				inventli.id = "inventli11";
+				inventli.firstChild.innerText = "Features";
+				inventli.firstChild.href = "javascript:inventdiv(11);";
+
+				$("#inventdiv1")[0].parentNode.appendChild(inventdiv);
+				settingsList.appendChild(header);
+				settingsList.appendChild(options);
+				options.appendChild(inventli);
+
+				const makeSetting = params => {
+					const obj = document.createElement("div");
+					obj.classList = "settingformsection mb-1";
+					obj.appendChild(document.createElement("div"));
+					obj.children[0].classList = "row mb-0-half";
+					obj.children[0].appendChild(document.createElement("div"));
+					obj.children[0].children[0].classList = "col-6";
+					obj.children[0].children[0].appendChild(document.createElement("label"));
+					obj.children[0].children[0].children[0].htmlFor = params.id;
+					obj.children[0].children[0].children[0].classList = "full-width text-right";
+					obj.children[0].children[0].children[0].innerText = params.displayText;
+					obj.children[0].appendChild(document.createElement("div"));
+					obj.children[0].children[1].classList = "col-6";
+					obj.children[0].children[1].appendChild(document.createElement("select"));
+					obj.children[0].children[1].children[0].id = params.id;
+					obj.children[0].children[1].children[0].name = params.id;
+					obj.children[0].children[1].children[0].classList = "full-width";
+					for (let i = 0; i < params.options.length; i++) {
+						obj.children[0].children[1].children[0].appendChild(document.createElement("option"));
+						obj.children[0].children[1].children[0].children[i].value = i;
+						obj.children[0].children[1].children[0].children[i].innerText = params.options[i];
+					}
+					obj.children[0].children[1].children[0].children[params.selected].setAttribute("selected", "selected");
+					return obj;
+				};
+
+				// const settingTemplate = $("#inventdiv2")[0].children[0].children[0].children[0].children[1];
+				// settingsform.appendChild(settingTemplate.cloneNode(true));
+				const displayLoot = makeSetting({
+					id: "displayLoot",
+					displayText: "Log Loot Drops to Battle Summary",
+					options: ["Off", "On"],
+					selected: scriptSettings.displayLoot,
+				});
+				settingsform.appendChild(displayLoot);
+				const nextPrevArea = makeSetting({
+					id: "nextPrevArea",
+					displayText: "Next & Previous Buttons in Travel Screen",
+					options: ["Off", "On"],
+					selected: scriptSettings.nextPrevArea,
+				});
+				settingsform.appendChild(nextPrevArea);
+				const nextPrevQuest = makeSetting({
+					id: "nextPrevQuest",
+					displayText: "Next & Previous Buttons in Quest Screen",
+					options: ["Off", "On"],
+					selected: scriptSettings.nextPrevQuest,
+				});
+				settingsform.appendChild(nextPrevQuest);
+				const nextPrevMob = makeSetting({
+					id: "nextPrevMob",
+					displayText: "Next & Previous Buttons in Battle Screen",
+					options: ["Off", "On"],
+					selected: scriptSettings.nextPrevMob,
+				});
+				settingsform.appendChild(nextPrevMob);
+				const seekQuestMob = makeSetting({
+					id: "seekQuestMob",
+					displayText: "Seek Quest Mob Button in Battle Screen",
+					options: ["Off", "On"],
+					selected: scriptSettings.seekQuestMob,
+				});
+				settingsform.appendChild(seekQuestMob);
+				const TSNoti = makeSetting({
+					id: "TSNoti",
+					displayText: "Tradeskill Notifications",
+					options: ["Off", "On"],
+					selected: scriptSettings.TSNoti,
+				});
+				settingsform.appendChild(TSNoti);
+				const dropTracker = makeSetting({
+					id: "dropTracker",
+					displayText: "Drop Tracker",
+					options: ["Off", "On"],
+					selected: scriptSettings.dropTracker,
+				});
+				settingsform.appendChild(dropTracker);
+				const uncapXP = makeSetting({
+					id: "uncapXP",
+					displayText: "Uncapped Level Display",
+					options: ["Off", "On"],
+					selected: scriptSettings.uncapXP,
+				});
+				settingsform.appendChild(uncapXP);
+				const pmapNoti = makeSetting({
+					id: "pmapNoti",
+					displayText: "Dungeon Room Complete Sound",
+					options: ["Off", "On"],
+					selected: scriptSettings.pmapNoti,
+				});
+				settingsform.appendChild(pmapNoti);
+				const gmapNoti = makeSetting({
+					id: "gmapNoti",
+					displayText: "Guild Dungeon Room Complete Sound",
+					options: ["Off", "On"],
+					selected: scriptSettings.gmapNoti,
+				});
+				settingsform.appendChild(gmapNoti);
+
+				const updateSettings = () => {
+					if (confirm("Please Refresh for Changes to Take Effect.\n(Pressing Cancel will result in your changes not saving)")) {
+						localStorage.setItem(
+							"LyrQoLSettings",
+							JSON.stringify({
+								displayLoot: displayLoot.value,
+								nextPrevArea: nextPrevArea.value,
+								nextPrevQuest: nextPrevQuest.value,
+								nextPrevMob: nextPrevMob.value,
+								seekQuestMob: seekQuestMob.value,
+								TSNoti: TSNoti.value,
+								dropTracker: dropTracker.value,
+								uncapXP: uncapXP.value,
+								pmapNoti: pmapNoti.value,
+								gmapNoti: gmapNoti.value,
+							})
+						);
+						location.reload();
+					}
+				};
+
+				const save = document.createElement("div");
+				save.classList = "row";
+				save.appendChild(document.createElement("div"));
+				save.children[0].classList = "col-12 text-right";
+				save.children[0].appendChild(document.createElement("input"));
+				save.children[0].children[0].setAttribute("type", "button");
+				save.children[0].children[0].value = "Save";
+				save.children[0].children[0].setAttribute("onclick", updateSettings.toString().split("() => {")[1].split("();")[0] + "();}");
+
+				settingsform.appendChild(save);
+
+				// const reset = document.createElement("div");
+				// reset.classList = "row";
+				// reset.appendChild(document.createElement("div"));
+				// reset.children[0].classList = "col-12 text-right";
+				// reset.children[0].appendChild(document.createElement("input"));
+				// reset.children[0].children[0].setAttribute("type", "button");
+				// reset.children[0].children[0].value = "Reset";
+				// reset.children[0].children[0].setAttribute("onclick", resetSettings.toString().split("{")[1].split("}")[0]);
+
+				// settingsform.appendChild(reset);
+			}
+		} else settingsOpened = false;
 	}).observe(popup, {
 		childList: true,
 		subtree: true,
+	});
+	const levelObserver = new MutationObserver(mutations => {
+		if (level.innerText.includes("(") || scriptSettings.uncapXP == 0) return;
+
+		let expPerAction = valuePerHour(eval(dropObj).XP) / 600;
+		let currentLevel = parseInt(level.innerText.replace(/,/g, ""));
+		let [bankedExperience, neededExperience] = document.getElementById("expli").firstChild.dataset.tippyContent.replace(/,/g, "").split("/").map(Number);
+		let finalLevel =
+			(1 / 50) *
+			(Math.sqrt(
+				4 * Math.pow(expPerAction, 2) -
+					100 * expPerAction * (2 * currentLevel + 1) +
+					25 * (8 * bankedExperience + 25 * Math.pow(2 * currentLevel + 1, 2))
+			) +
+				2 * expPerAction -
+				25);
+
+		document.getElementById("expli").firstChild.innerText = (Math.round((bankedExperience / neededExperience) * 10000) / 100).toLocaleString() + "%";
+		level.innerText += " (" + Math.floor(finalLevel).toLocaleString() + ")";
+	}).observe(level, {
+		childList: true,
 	});
 })();
 
 function interval() {
 	try {
-		checkTS();
+		if (scriptSettings.TSNoti == 1) checkTS();
 	} catch (e) {} // Wrapping this in a try catch just so that it doesn't prevent the script from running if you refresh whilst TS are not running
 	setTimeout(interval, 6e4);
 }
@@ -356,19 +590,12 @@ function checkTS() {
 		playAudio(tsCompleted);
 		return notification("No Tradeskill Running.", "You do not currently have any tradeskills running.");
 	}
-	if ($("#ts1")[0]?.innerText === "00:00") {
-		playAudio(tsCompleted);
-		return notification("Tradeskill Completed.", "You have one or more tradeskills that have been completed.");
-	}
-	if ($("#ts2")[0]?.innerText === "00:00") {
-		playAudio(tsCompleted);
-		return notification("Tradeskill Completed.", "You have one or more tradeskills that have been completed.");
-	}
-	if ($("#ts3")[0]?.innerText === "00:00") {
-		playAudio(tsCompleted);
-		return notification("Tradeskill Completed.", "You have one or more tradeskills that have been completed.");
-	}
-	if ($("#ts4")[0]?.innerText === "00:00") {
+	if (
+		$("#ts1")[0]?.innerText === "00:00" ||
+		$("#ts2")[0]?.innerText === "00:00" ||
+		$("#ts3")[0]?.innerText === "00:00" ||
+		$("#ts4")[0]?.innerText === "00:00"
+	) {
 		playAudio(tsCompleted);
 		return notification("Tradeskill Completed.", "You have one or more tradeskills that have been completed.");
 	}
@@ -470,6 +697,7 @@ function initTracker() {
 	dropTracker = document.createElement("div");
 	dropTracker.id = "droptracker";
 	dropTracker.style.visibility = "visible";
+	if (scriptSettings.dropTracker == 0) dropTracker.style.display = "none";
 
 	let header = document.createElement("h3");
 	header.textContent = "Drop Tracker";
@@ -518,6 +746,8 @@ function initTracker() {
 }
 
 function updateTracker() {
+	if (scriptSettings.dropTracker == 0) dropTracker.style.display = "none";
+
 	let dropObj = "drops";
 	$("#droptracker")[0].firstChild.innerText = "Drop Tracker";
 	if ($(".battleContainer")[0]?.children[1].innerText.includes("Shadow of ")) {
@@ -579,6 +809,28 @@ function saveFilters() {
 	localStorage.setItem("DropFilter", JSON.stringify(dropFilters));
 }
 
+function resetFilters() {
+	dropFilters = defaultDropFilters;
+	saveFilters();
+	updateTracker();
+}
+
+function loadSettings() {
+	if (localStorage.getItem("LyrQoLSettings")) {
+		scriptSettings = JSON.parse(localStorage.getItem("LyrQoLSettings"));
+	}
+}
+
+function saveSettings() {
+	localStorage.setItem("LyrQoLSettings", JSON.stringify(scriptSettings));
+}
+
+function resetSettings() {
+	scriptSettings = defaultScriptSettings;
+	saveSettings();
+	loadSettings();
+}
+
 function loadDrops() {
 	if (localStorage.getItem("Drops")) {
 		drops = JSON.parse(localStorage.getItem("Drops"));
@@ -607,12 +859,6 @@ function saveDrops() {
 			lossCount: lossCount,
 		})
 	);
-}
-
-function resetFilters() {
-	dropFilters = defaultDropFilters;
-	saveFilters();
-	updateTracker();
 }
 
 function playAudio(sound, volume = null) {

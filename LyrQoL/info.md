@@ -7,12 +7,14 @@
     -   Drop Tracker
     -   Uncapped Level % Display
     -   Added Sound for Guild and Personal Dungeon Room Completion
+    -   Ability to toggle any and all of the script's features, in case one were to get annoyed with them
 -   Known Bugs
-    -   Guild Boss Damage Tracker tries to read Area Boss too
     -   Some features no longer work after consuming a potion
+    -   Guild Boss Damage Tracker tries to read Area Boss too
     -   Guild Boss Damage Tracker doesn't account for the fact that summarize boss screen exists
     -   Guild Boss Damage Tracker formula isn't very accurate
 -   Planned Features
-    -   Ability to toggle any and all of the script's features, in case one were to get annoyed with them
     -   Add more things to Drop Tracker
     -   Global Filter for specific Players and/or Guild
+    -   Add Script Update Available message somewhere
+    -   Move Filters into Settings
