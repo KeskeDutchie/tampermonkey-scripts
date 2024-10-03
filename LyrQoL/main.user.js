@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lyr QoL
 // @namespace    https://lyrania.co.uk
-// @version      0.3
+// @version      0.3.1
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -311,8 +311,15 @@ if (Notification.permission !== "denied") {
 			if (!dropTracked) console.log(dropText);
 
 			if (scriptSettings.displayLoot == 1) {
-				obj.before(document.createTextNode(dropText));
-				obj.before(document.createElement("br"));
+				if ($(".battleContainer")[0]?.children[1].innerText.includes("Shadow of ")) {
+					obj.before(document.createElement("br"));
+					obj.before(document.createTextNode(dropText));
+				} else if (obj == document.querySelector("#content > div:nth-child(2) > div.flex-content > span:nth-child(14)")) {
+					obj.before(document.createTextNode(dropText));
+				} else {
+					obj.before(document.createTextNode(dropText));
+					obj.before(document.createElement("br"));
+				}
 			}
 		});
 
