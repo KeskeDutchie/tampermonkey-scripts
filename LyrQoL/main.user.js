@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lyr QoL
 // @namespace    https://lyrania.co.uk
-// @version      0.3.1
+// @version      0.3.2
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -621,8 +621,10 @@ function format(filterText) {
 
 function getBossTickDamage(bossSummary) {
 	let tickDamage = 0;
-	for (let i = 0; bossSummary.innerText.split("\n")[4 + i].startsWith("You"); i++) {
-		tickDamage += Number(bossSummary.innerText.split("\n")[4 + i].split("for ")[1].split("!")[0].replace(/,/g, ""));
+	let startOffset = 0;
+	for (startOffset = 0; !bossSummary.innerText.split("\n")[startOffset].includes("terrible"); startOffset++);
+	for (let i = 0; bossSummary.innerText.split("\n")[2 + i + startOffset].startsWith("You"); i++) {
+		tickDamage += Number(bossSummary.innerText.split("\n")[2 + i + startOffset].split("for ")[1].split("!")[0].replace(/,/g, ""));
 	}
 	return tickDamage;
 }
