@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name         Dev Lyr QoL
-// @namespace    https://dev.lyrania.co.uk
-// @version      0.3.1
+// @name         Lyr QoL
+// @namespace    https://lyrania.co.uk
+// @version      0.3.3
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
-// @match        *dev.lyrania.co.uk/game.php
+// @match        *lyrania.co.uk/game.php
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=lyrania.co.uk
-// @downloadURL  https://github.com/KeskeDutchie/tampermonkey-scripts/raw/main/LyrQoL/dev.user.js
-// @updateURL    https://github.com/KeskeDutchie/tampermonkey-scripts/raw/main/LyrQoL/dev.user.js
+// @downloadURL  https://github.com/KeskeDutchie/tampermonkey-scripts/raw/main/LyrQoL/main.user.js
+// @updateURL    https://github.com/KeskeDutchie/tampermonkey-scripts/raw/main/LyrQoL/main.user.js
 // ==/UserScript==
 
 const chatwindow = document.getElementById("chatwindow");
@@ -26,6 +26,7 @@ let drops = {};
 let gmapDrops = {};
 let actionCount = 0;
 let guildActionCount = 0;
+let wasAutoingInGuildMap = false;
 let defaultDropFilters = {
 	"Platinum": true,
 	"XP": true,
@@ -98,7 +99,7 @@ if (Notification.permission !== "denied") {
 			next.value = "Next";
 			next.setAttribute(
 				"onclick",
-				'if ($("#travellist")[0].selectedIndex != $("#travellist")[0].children.length - 1) {$("#travellist")[0].selectedIndex += 1;}'
+				'if ($("#travellist")[0].selectedIndex != $("#travellist")[0].children.length - 1) {$("#travellist")[0].selectedIndex += 1;}',
 			);
 			next.style.marginLeft = "4px";
 
@@ -127,7 +128,7 @@ if (Notification.permission !== "denied") {
 					'searchTerm = searchTerm.substring(searchTerm.indexOf(" ") + 1).split("s\\n")[0];}' +
 					'for (let i = 0; i < $("#mob")[0].options.length; i++) {' +
 					'if ($("#mob")[0].options[i].text == searchTerm) {' +
-					'$("#mob")[0].options[i].selected = true; return;}}'
+					'$("#mob")[0].options[i].selected = true; return;}}',
 			);
 			seek.style.marginTop = "4px";
 			seek.style.marginRight = "4px";
@@ -154,16 +155,17 @@ if (Notification.permission !== "denied") {
 			if ($(".battleContainer")[0].children[1].innerText.includes("Shadow of ")) {
 				dropObj = "gmapDrops";
 				guildActionCount++;
-				if (
-					!content.querySelectorAll("div.strong.text-center")[0] &&
-					content.querySelector("#content > div:nth-child(2) > div.flex-content").lastChild &&
-					document.querySelector("#timer").innerText.slice(-1) == "6" &&
-					scriptSettings.gmapNoti == 1
-				) {
-					setTimeout(() => {
-						playAudio(dungeonRoomCompleted);
-					}, 6e3);
-				}
+				if (document.querySelector("#timer").innerText.slice(-1) == "6") wasAutoingInGuildMap = true;
+				// if (
+				// 	!content.querySelectorAll("div.strong.text-center")[0] &&
+				// 	content.querySelector("#content > div:nth-child(2) > div.flex-content").lastChild &&
+				// 	document.querySelector("#timer").innerText.slice(-1) == "6" &&
+				// 	scriptSettings.gmapNoti == 1
+				// ) {
+				// 	setTimeout(() => {
+				// 		playAudio(dungeonRoomCompleted);
+				// 	}, 6e3);
+				// }
 			} else {
 				actionCount++;
 				if (!parseFor(battleSummary, "Gold")) {
@@ -233,6 +235,9 @@ if (Notification.permission !== "denied") {
 			}
 			updateTracker();
 			return;
+		} else if (wasAutoingInGuildMap) {
+			wasAutoingInGuildMap = false;
+			playAudio(dungeonRoomCompleted);
 		}
 		const bossSummary = content.querySelector("div");
 		if (bossSummary && parseFor(bossSummary, "terrible")) {
@@ -251,12 +256,12 @@ if (Notification.permission !== "denied") {
 
 			bossSummary.insertBefore(
 				document.createTextNode("(You have done " + tickDamage.toLocaleString() + " damage to this boss this action)"),
-				insertPosition(bossSummary, "SPAN")
+				insertPosition(bossSummary, "SPAN"),
 			);
 			bossSummary.insertBefore(document.createElement("br"), insertPosition(bossSummary, "SPAN"));
 			bossSummary.insertBefore(
 				document.createTextNode("(You are predicted to deal " + predictedDamage.toLocaleString() + " damage to this boss)"),
-				insertPosition(bossSummary, "SPAN")
+				insertPosition(bossSummary, "SPAN"),
 			);
 			bossSummary.insertBefore(document.createElement("br"), insertPosition(bossSummary, "SPAN"));
 			return;
@@ -363,7 +368,7 @@ if (Notification.permission !== "denied") {
 				questOpened = true;
 				questMob.parentNode.insertBefore(
 					document.createElement("br"),
-					questMob.parentNode.children[Array.prototype.indexOf.call(questMob.parentNode.children, questMob) + 1]
+					questMob.parentNode.children[Array.prototype.indexOf.call(questMob.parentNode.children, questMob) + 1],
 				);
 				const prev = document.createElement("input");
 				prev.type = "button";
@@ -374,7 +379,7 @@ if (Notification.permission !== "denied") {
 				next.value = "Next";
 				next.setAttribute(
 					"onclick",
-					'if ($("#quest_mob")[0].selectedIndex != $("#quest_mob")[0].children.length - 1) {$("#quest_mob")[0].selectedIndex += 1;}'
+					'if ($("#quest_mob")[0].selectedIndex != $("#quest_mob")[0].children.length - 1) {$("#quest_mob")[0].selectedIndex += 1;}',
 				);
 				questMob.parentNode.insertBefore(prev, questMob.parentNode.children[Array.prototype.indexOf.call(questMob.parentNode.children, questMob) + 2]);
 				prev.outerHTML += " ";
@@ -529,7 +534,7 @@ if (Notification.permission !== "denied") {
 								uncapXP: uncapXP.value,
 								pmapNoti: pmapNoti.value,
 								gmapNoti: gmapNoti.value,
-							})
+							}),
 						);
 						location.reload();
 					}
@@ -573,7 +578,7 @@ if (Notification.permission !== "denied") {
 			(Math.sqrt(
 				4 * Math.pow(expPerAction, 2) -
 					100 * expPerAction * (2 * currentLevel + 1) +
-					25 * (8 * bankedExperience + 25 * Math.pow(2 * currentLevel + 1, 2))
+					25 * (8 * bankedExperience + 25 * Math.pow(2 * currentLevel + 1, 2)),
 			) +
 				2 * expPerAction -
 				25);
@@ -621,8 +626,10 @@ function format(filterText) {
 
 function getBossTickDamage(bossSummary) {
 	let tickDamage = 0;
-	for (let i = 0; bossSummary.innerText.split("\n")[4 + i].startsWith("You"); i++) {
-		tickDamage += Number(bossSummary.innerText.split("\n")[4 + i].split("for ")[1].split("!")[0].replace(/,/g, ""));
+	let startOffset = 0;
+	for (startOffset = 0; !bossSummary.innerText.split("\n")[startOffset].includes("terrible"); startOffset++);
+	for (let i = 0; bossSummary.innerText.split("\n")[2 + i + startOffset].startsWith("You"); i++) {
+		tickDamage += Number(bossSummary.innerText.split("\n")[2 + i + startOffset].split("for ")[1].split("!")[0].replace(/,/g, ""));
 	}
 	return tickDamage;
 }
@@ -864,7 +871,7 @@ function saveDrops() {
 			guildActionCount: guildActionCount,
 			winCount: winCount,
 			lossCount: lossCount,
-		})
+		}),
 	);
 }
 
