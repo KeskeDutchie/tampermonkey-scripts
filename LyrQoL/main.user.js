@@ -235,7 +235,7 @@ if (Notification.permission !== "denied") {
 			}
 			updateTracker();
 			return;
-		} else if (wasAutoingInGuildMap) {
+		} else if (wasAutoingInGuildMap && scriptSettings.gmapNoti == 1) {
 			wasAutoingInGuildMap = false;
 			playAudio(dungeonRoomCompleted);
 		}
