@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lyr QoL
 // @namespace    https://lyrania.co.uk
-// @version      0.3.3
+// @version      0.3.4
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -168,7 +168,7 @@ if (Notification.permission !== "denied") {
 				// }
 			} else {
 				actionCount++;
-				if (!parseFor(battleSummary, "Gold")) {
+				if (!parseFor(battleSummary, "Money")) {
 					if (!parseFor(battleSummary, "You were defeated")) {
 						winCount++;
 						return updateTracker();
@@ -185,10 +185,10 @@ if (Notification.permission !== "denied") {
 				eval(dropObj).Platinum += platToMoney($("#treasuryreceivedGDP")[0].innerText.split("received ")[1].split(" from")[0].replace(/,/g, ""));
 			}
 
-			if (platToMoney(parseFor(battleSummary, "Gold: ").split(": ")[1].split(" -")[0].replace(/,/g, "")) > 0) {
+			if (platToMoney(parseFor(battleSummary, "Money: ").split(": ")[1].split(" -")[0].replace(/,/g, "")) > 0) {
 				if (!eval(dropObj).Platinum) eval(dropObj).Platinum = 0;
 
-				eval(dropObj).Platinum += platToMoney(parseFor(battleSummary, "Gold: ").split(": ")[1].split(" -")[0].replace(/,/g, ""));
+				eval(dropObj).Platinum += platToMoney(parseFor(battleSummary, "Money: ").split(": ")[1].split(" -")[0].replace(/,/g, ""));
 			}
 
 			if (eval(parseFor(battleSummary, "Exp").split("- ")[1].split("*")[0].replace(/,/g, "")) > 0) {
