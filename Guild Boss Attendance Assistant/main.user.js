@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Guild Boss Attendance Assistant
 // @namespace    https://lyrania.co.uk
-// @version      1.4
+// @version      1.4.1
 // @description  try to take over the world!
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -11,8 +11,9 @@
 // @downloadUrl  https://raw.githubusercontent.com/KeskeDutchie/tampermonkey-scripts/main/Guild%20Boss%20Attendance%20Assistant/main.user.js
 // ==/UserScript==
 
-const chatwindow = document.getElementById("chatwindow");
-const chattabs = document.getElementById("chattabs");
+const chatwindow = await waitForElm("#chatwindow");
+const chattabs = await waitForElm("#chattabs");
+const chatpanes = await waitForElm("#chatpanes");
 
 var attendanceLog;
 var countText;
@@ -47,7 +48,7 @@ function initLog() {
 	attendanceLog.id = "attendancelog";
 	attendanceLog.classList.add("tab-content");
 	attendanceLog.style.cssText =
-		"position: relative;margin-top: 5px;float: left;min-height: 200px;height: 38vh;width: 100%;overflow: auto;padding-top: 5px;resize: vertical;font-size: 13px;" +
+		"position: relative;float: left;height: 100%;width: 100%;overflow: auto;padding-top: 5px;resize: vertical;font-size: 13px;" +
 		"background-color: #000;border: 1px solid white;border-radius: 15px 0px 0px 0px;";
 
 	const tabButton = document.createElement("a");
@@ -80,15 +81,14 @@ function initLog() {
 	countText.textContent = "Player Count: 0";
 	countText.style.cssText = "float:right;padding:5px;";
 
-	chattabs.insertBefore(attendanceLog, chattabs.children[2]);
-	chattabs.children[3].append(tabButton);
+	chatpanes.insertBefore(attendanceLog, null);
+	chattabs.children[1].append(tabButton);
 	document.getElementById("chat").insertBefore(resetButton, chattabs);
 	document.getElementById("chat").insertBefore(countText, chattabs);
 }
 
 function initUsers() {
     var rawLog = localStorage.getItem("Attendance Log");
-    console.log(rawLog);
     if (!rawLog) rawLog = JSON.stringify({ users: [] });
     var savedLog = JSON.parse(rawLog);
     for (var i = 0; i < savedLog.users.length; i++) {
@@ -111,4 +111,25 @@ function addUser(user) {
 function setCount(c) {
 	count = c;
 	countText.textContent = "Player Count: " + count;
+}
+
+function waitForElm(selector) {
+    return new Promise(resolve => {
+        if (document.querySelector(selector)) {
+            return resolve(document.querySelector(selector));
+        }
+
+        const observer = new MutationObserver(mutations => {
+            if (document.querySelector(selector)) {
+                observer.disconnect();
+                resolve(document.querySelector(selector));
+            }
+        });
+
+        // If you get "parameter 1 is not of type 'Node'" error, see https://stackoverflow.com/a/77855838/492336
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
 }
