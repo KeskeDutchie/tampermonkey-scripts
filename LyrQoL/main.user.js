@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lyr QoL
 // @namespace    https://lyrania.co.uk
-// @version      0.3.5
+// @version      0.3.5.1
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -401,7 +401,7 @@ if (Notification.permission !== "denied") {
 				loadSettings();
 				const settingsList = settings.children[0].children[0];
 				const inventdiv = $("#inventdiv2")[0].cloneNode();
-				inventdiv.id = "inventdiv11";
+				inventdiv.id = "inventdiv12";
 				inventdiv.appendChild($("#inventdiv2")[0].children[0].cloneNode());
 				inventdiv.children[0].appendChild($("#inventdiv2")[0].children[0].children[0].cloneNode());
 				inventdiv.children[0].children[0].appendChild($("#inventdiv2")[0].children[0].children[0].children[0].cloneNode());
