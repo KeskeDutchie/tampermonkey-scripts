@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lyr QoL
 // @namespace    https://lyrania.co.uk
-// @version      0.3.5
+// @version      0.3.6
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -292,17 +292,16 @@ if (Notification.permission !== "denied") {
 				valueChanged = true;
 			}
 			if (!obj) {
-				obj = content.querySelector("#content > div:nth-child(2) > div.flex-content").lastChild; // Map Room Finished or Single Map Battle
+				obj = document.querySelector("#content > div:nth-child(3) > div.flex-content > br"); // Map Room Finished or Single Map Battle
 				valueChanged = true;
 			}
-			if (valueChanged) obj.previousSibling.remove();
 		} else if ($("#mobsLeft")[0] || $("#bb")[0]) {
 			if (!obj) {
 				obj = document.querySelector("div > div.flex-content > div.strong.text-center"); // Pmap auto
 				valueChanged = true;
 			}
 			if (!obj) {
-				obj = document.querySelector("#content > div:nth-child(2) > div.flex-content > span:nth-child(14)"); // PMap Room Finished or Single PMap Battle
+				obj = document.querySelector("#content > div:nth-child(3) > div.flex-content > br"); // PMap Room Finished or Single PMap Battle
 				valueChanged = true;
 			}
 		}
@@ -310,6 +309,9 @@ if (Notification.permission !== "denied") {
 		mutations.forEach(mutation => {
 			if (!mutation.addedNodes[0]) return;
 			const dropText = mutation.addedNodes[0].innerText.split("] ")[1];
+			const dropDiv = document.createElement("div");
+			dropDiv.classList = "text-center";
+			dropDiv.innerText = dropText;
 
 			const dropTracked = parseDrops(dropText);
 
@@ -317,18 +319,19 @@ if (Notification.permission !== "denied") {
 
 			if (scriptSettings.displayLoot == 1) {
 				if ($(".battleContainer")[0]?.children[1].innerText.includes("Shadow of ")) {
-					obj.before(document.createElement("br"));
-					obj.before(document.createTextNode(dropText));
-				} else if (obj == document.querySelector("#content > div:nth-child(2) > div.flex-content > span:nth-child(14)")) {
-					obj.before(document.createTextNode(dropText));
+					obj.before(dropDiv);
+					console.log("gmap");
+				} else if (obj == document.querySelector("#content > div:nth-child(3) > div.flex-content > br")) {
+					obj.before(dropDiv);
+					console.log("single");
 				} else {
-					obj.before(document.createTextNode(dropText));
-					obj.before(document.createElement("br"));
+					obj.before(dropDiv);
+					console.log("auto");
 				}
 			}
 		});
 
-		if (valueChanged && scriptSettings.displayLoot == 1) obj.before(document.createElement("br"));
+		// if (valueChanged && scriptSettings.displayLoot == 1) obj.before(document.createElement("br"));
 	}).observe(lootlog, {
 		childList: true,
 	});
