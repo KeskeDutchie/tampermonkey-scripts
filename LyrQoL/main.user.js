@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lyr QoL
 // @namespace    https://lyrania.co.uk
-// @version      0.3.4
+// @version      0.3.5
 // @description  Something Something hi Midith
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -408,12 +408,12 @@ if (Notification.permission !== "denied") {
 				const settingsform = inventdiv.children[0].children[0].children[0];
 
 				const header = settingsList.children[0].cloneNode();
-				header.innerText = "Lyr QoL";
+				header.innerText = "Script Settings";
 				const options = settingsList.children[1].cloneNode();
 				const inventli = $("#inventli2")[0].cloneNode(true);
-				inventli.id = "inventli11";
+				inventli.id = "inventli12";
 				inventli.firstChild.innerText = "Features";
-				inventli.firstChild.href = "javascript:inventdiv(11);";
+				inventli.firstChild.href = "javascript:inventdiv(12);";
 
 				$("#inventdiv1")[0].parentNode.appendChild(inventdiv);
 				settingsList.appendChild(header);

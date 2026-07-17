@@ -401,19 +401,19 @@ if (Notification.permission !== "denied") {
 				loadSettings();
 				const settingsList = settings.children[0].children[0];
 				const inventdiv = $("#inventdiv2")[0].cloneNode();
-				inventdiv.id = "inventdiv11";
+				inventdiv.id = "inventdiv12";
 				inventdiv.appendChild($("#inventdiv2")[0].children[0].cloneNode());
 				inventdiv.children[0].appendChild($("#inventdiv2")[0].children[0].children[0].cloneNode());
 				inventdiv.children[0].children[0].appendChild($("#inventdiv2")[0].children[0].children[0].children[0].cloneNode());
 				const settingsform = inventdiv.children[0].children[0].children[0];
 
 				const header = settingsList.children[0].cloneNode();
-				header.innerText = "Lyr QoL";
+				header.innerText = "Script Settings";
 				const options = settingsList.children[1].cloneNode();
 				const inventli = $("#inventli2")[0].cloneNode(true);
-				inventli.id = "inventli11";
+				inventli.id = "inventli12";
 				inventli.firstChild.innerText = "Features";
-				inventli.firstChild.href = "javascript:inventdiv(11);";
+				inventli.firstChild.href = "javascript:inventdiv(12);";
 
 				$("#inventdiv1")[0].parentNode.appendChild(inventdiv);
 				settingsList.appendChild(header);
