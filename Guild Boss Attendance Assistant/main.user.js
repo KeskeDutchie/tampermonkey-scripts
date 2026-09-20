@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Guild Boss Attendance Assistant
 // @namespace    https://lyrania.co.uk
-// @version      1.4.1
+// @version      1.4.2
 // @description  try to take over the world!
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -32,9 +32,9 @@ var count = 0;
 		mutations.forEach(mutation => {
 			if (!mutation.addedNodes[0]) return;
 			const message = mutation.addedNodes[0].getElementsByClassName("guildchatcolor")[0];
-			if (message?.lastChild?.lastChild?.lastChild?.textContent?.includes("rolled")) {
+			if (message?.lastChild?.lastChild?.textContent?.includes("rolled")) {
 				addUser(
-					message.lastChild.firstChild.firstChild.innerText.replace("Mod ", "").replace("Admin ", "").replace("Community ", "").replace("Owner ", "")
+					message.querySelectorAll('.chatname')[1].innerText.replace("Mod ", "").replace("Admin ", "").replace("Community ", "").replace("Owner ", "")
 				);
 			}
 		});
@@ -79,12 +79,14 @@ function initLog() {
 
 	countText = document.createElement("div");
 	countText.textContent = "Player Count: 0";
-	countText.style.cssText = "float:right;padding:5px;";
+	countText.style.cssText = "float:right;text-align:right;padding:5px;";
 
 	chatpanes.insertBefore(attendanceLog, null);
 	chattabs.children[1].append(tabButton);
-	document.getElementById("chat").insertBefore(resetButton, chattabs);
-	document.getElementById("chat").insertBefore(countText, chattabs);
+	$(".chat-controls-row").append(countText);
+    $(".chat-controls-row").append(resetButton);
+    //document.getElementById("chat").insertBefore(resetButton, chattabs);
+	//document.getElementById("chat").insertBefore(countText, chattabs);
 }
 
 function initUsers() {
