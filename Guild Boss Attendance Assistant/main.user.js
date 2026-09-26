@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Guild Boss Attendance Assistant
 // @namespace    https://lyrania.co.uk
-// @version      1.4.2
+// @version      1.4.3
 // @description  try to take over the world!
 // @author       KeskeDutchie
 // @match        *lyrania.co.uk/game.php
@@ -61,7 +61,6 @@ function initLog() {
 	resetButton.type = "button";
 	resetButton.id = "resetbutton";
 	resetButton.value = "Copy and Reset Log";
-	resetButton.style.float = "right";
 	resetButton.onclick = () => {
 		var usersString = "";
 		for (var i = 0; i < users.length; i++) usersString += users[i] + ",";
@@ -79,14 +78,17 @@ function initLog() {
 
 	countText = document.createElement("div");
 	countText.textContent = "Player Count: 0";
-	countText.style.cssText = "float:right;text-align:right;padding:5px;";
+	countText.style.cssText = "white-space: nowrap;";
+
+    const controlsWrapper = document.createElement("div");
+    controlsWrapper.style.cssText = "display: flex; align-items: center; gap: 8px; margin-left: auto;";
+    controlsWrapper.append(countText);
+    controlsWrapper.append(resetButton);
 
 	chatpanes.insertBefore(attendanceLog, null);
 	chattabs.children[1].append(tabButton);
-	$(".chat-controls-row").append(countText);
-    $(".chat-controls-row").append(resetButton);
-    //document.getElementById("chat").insertBefore(resetButton, chattabs);
-	//document.getElementById("chat").insertBefore(countText, chattabs);
+
+    $(".chat-controls-row").css("display", "flex").append(controlsWrapper);
 }
 
 function initUsers() {
